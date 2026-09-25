@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Builder Pattern in Next.js | Bank Transfer Form
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/react-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 
-First, run the development server:
+**Live:** [bdlc-01-article-pattern-builder.vercel.app](https://bdlc-01-article-pattern-builder.vercel.app)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+A small, focused example of the **Builder design pattern** in a modern Next.js app. A bank transfer form sends its data to a **Server Action**, which builds and validates a `Transfer` object step by step with a fluent `TransferBuilder`.
+
+## What it shows
+
+- **Builder pattern:** `TransferBuilder` sets each field with a chainable method (`setFromAccount().setToAccount().setAmount()...`) and validates the object in `build()`.
+- **Validation at the right step:** `setAmount()` rejects amounts ≤ 0. `build()` rejects a transfer without origin account, destination account or amount.
+- **Sensible defaults:** currency starts as `USD`. Reference and message are optional.
+- **Server Actions:** the form posts to `processTransfer` (`"use server"`) with no API route.
+- **Pending UI with `useTransition`:** the submit button shows "Procesando..." and is disabled while the action runs.
+
+## How it works
+
+```ts
+const transfer = new TransferBuilder()
+  .setFromAccount(data.fromAccount)
+  .setToAccount(data.toAccount)
+  .setAmount(parseFloat(data.amount))
+  .setCurrency(data.currency)
+  .setReference(data.reference)
+  .setMessage(data.message)
+  .build();
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/page.tsx              Transfer form (client component)
+actions/transfer.tsx      Server Action that uses the builder
+lib/transferBuilder.ts    Transfer type and TransferBuilder class
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech stack
 
-## Learn More
+Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS.
 
-To learn more about Next.js, take a look at the following resources:
+## Getting started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000).
